@@ -12,20 +12,33 @@ static struct dentry *eudyptula_dentry;
 #define MY_ID_LEN 8
 
 static ssize_t id_fop_read(struct file *fp, char __user *user_buffer, 
-		size_t count, loff_t *position) { 
+		size_t count, loff_t *position) {
+  if (*position != 0)
+    return 0;
+  if ((count < MY_ID_LEN) || (copy_to_user(buf, MY_ID, MY_ID_LEN)))
+    return -EINVAL;
 
-	
-	
+  *position += count;
+  return count;
 }
 
 
 static ssize_t id_fop_write(struct file *fp, const char __user *user_buffer, 
-		size_t count, loff_t *position) {
+                            size_t count, loff_t *position) {
 
+  char buf[MY_ID_LEN];
+  
+  if ((count != MY_ID_LEN)
+      || (copy_from_user(buf, MY_ID, MY_ID_LEN))
+      || (strncmp(buf, MY_ID) != 0))
+      return -EINVAL;
+  else
+    return count;
 }
 
 static ssize_t jiffies_fop_read(struct file *fp, char __user *user_buffer, 
-		size_t count, loff_t *position) { 
+		size_t count, loff_t *position) {
+  
 	
 }
 
