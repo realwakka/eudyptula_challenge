@@ -41,20 +41,23 @@ static ssize_t id_fop_write(struct file *fp, const char __user *user_buffer,
 
 static ssize_t jiffies_fop_read(struct file *fp, char __user *user_buffer, 
                                 size_t count, loff_t *position) {
-
+  char buf[255];
+  unsigned int size;
   if (*position != 0)
     return 0;
 
-
-  if (count < sizeof(jiffies)
-      || copy_to_user(user_buffer, (void*)&jiffies, sizeof(jiffies))) {
+  sprintf(buf, "%lu", jiffies);
+  size = strlen(buf);
+  
+  if (count < size
+      || copy_to_user(user_buffer, (void*)&buf, size)) {
     return -EINVAL;
   }
 
 
-  *position += count;
+  *position += size;
 
-  return sizeof(jiffies);
+  return size;
 }
 
 static ssize_t foo_fop_read(struct file *fp, char __user *user_buffer, 
@@ -116,7 +119,7 @@ static int hello_init(void)
   eudyptula_dentry = debugfs_create_dir("eudyptula", NULL);
 
   debugfs_create_file("id", 0644, eudyptula_dentry, NULL, &id_fops);
-  debugfs_create_file("jiffies", 0644, eudyptula_dentry, NULL, &jiffies_fops);
+  debugfs_create_file("jiffies", 0444, eudyptula_dentry, NULL, &jiffies_fops);
   debugfs_create_file("foo", 0644, eudyptula_dentry, NULL, &foo_fops);
   return 0;
 }
