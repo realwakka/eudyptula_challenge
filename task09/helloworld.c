@@ -6,6 +6,20 @@
 #include <linux/timer.h>
 #include <linux/uaccess.h>
 
+struct foo_attr {
+	struct device_attribute attr;
+	int value;
+};
+
+static struct foo_attr foo_value;
+
+static struct attribute *foo_attrs[] = {
+	&foo_value.attr.attr,
+	NULL
+};
+
+ATTRIBUTE_GROUPS(eudyptula);
+
 static DEFINE_SEMAPHORE(foo_sem);
 static struct dentry *eudyptula_dentry;
 
